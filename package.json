@@ -1,6 +1,6 @@
 {
   "name": "dsh-deepai-freemodel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": false,
   "type": "module",
   "description": "DeepAI Code 免费模型接入 DeepSeek Harness：浏览器 OAuth 登录直连上游，自带诊断面板与手动 Key 兜底，无需桌面客户端或网关进程。",
@@ -36,7 +36,7 @@
   "license": "MIT",
   "engines": {
     "node": "^22.19.0 || >=24.0.0",
-    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+    "dsh": ">=0.2.0-rc.1 <0.4.0-0"
   },
   "peerDependencies": {
     "@deepseek-ai/dsh-llm": "^0.1.2-rc.1 || ^0.1.7-rc.2 || ^0.2.0-rc.1",
@@ -74,6 +74,7 @@
   },
   "files": [
     "lib",
+    "scripts",
     "cordis.patch.yml",
     "dsh.plugin.json",
     "README.md",

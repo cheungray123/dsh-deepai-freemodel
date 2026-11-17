@@ -13,12 +13,11 @@
 
 ## 安装
 
-在 DSH 里打开 **设置 → 插件 → 添加插件**，选这个包所在的目录（或填入包名从 npm 安装）。
+在 DSH 里打开 **设置 → 插件 → 添加插件**，填入包名 `dsh-deepai-freemodel`（从 npm 安装），
+或 GitHub 仓库地址 `https://github.com/cheungray123/dsh-deepai-freemodel`，
+或本包所在的本地目录。
 
 装好后在 **设置 → DeepAI 免费模型** 点「用浏览器登录」，用 Google 账号完成一次授权。
-
-本仓库是开发副本：DSH 把它装成了指向当前目录的链接，改完 `lib/` 里的文件重启 DSH 即生效。
-
 
 > 上游只接受 Google / Apple 登录的账号。邮箱密码注册的账号会被 `403 social_login_required` 拒绝，
 > 换号或重试都无效。
