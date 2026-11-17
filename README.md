@@ -17,6 +17,16 @@
 或 GitHub 仓库地址 `https://github.com/cheungray123/dsh-deepai-freemodel`，
 或本包所在的本地目录。
 
+命令行等价写法，`dsh plugin add` 后面接的就是插件页里要填的那一段：
+
+```bash
+dsh plugin add dsh-deepai-freemodel
+```
+
+> 走 npmmirror 等国内镜像时同步有延迟，可能只拉到首次发布留下的占位版本，
+> 报「这个包没有声明组合包」（占位版本的 `package.json` 里没有 `dsh.bundle`）。
+> 在插件页把 **安装源** 切到 **npm 官方源**，命令行则加 `--registry=https://registry.npmjs.org`。
+
 装好后在 **设置 → DeepAI 免费模型** 点「用浏览器登录」，用 Google 账号完成一次授权。
 
 > 上游只接受 Google / Apple 登录的账号。邮箱密码注册的账号会被 `403 social_login_required` 拒绝，
