@@ -269,11 +269,11 @@ check("system 自动补齐", built.messages[0].role === "system" && built.messag
 check("stop 透传", Array.isArray(built.stop) && built.stop[0] === "END");
 check("temperature 透传", built.temperature === 0.2);
 check("max_completion_tokens", built.max_completion_tokens === 64);
-check("prompt_cache_key 来自 sessionId", built.prompt_cache_key === "8f1d0c7a-1234-4abc-9def-0123456789ab");
+check("不发送 prompt_cache_key", !("prompt_cache_key" in built));
 check("工具 schema 包裹", built.tools?.[0]?.type === "function" && built.tools[0].function.name === "read");
 
 const badSession = buildChatBody({ messages: [{ role: "user", content: [] }], sessionId: "bad id!" }, "m");
-check("非法 sessionId 不发", !("prompt_cache_key" in badSession));
+check("非法 sessionId 也不发", !("prompt_cache_key" in badSession));
 
 const developer = toOpenAIMessages([{ role: "developer", content: [{ type: "text", text: "x" }] }]);
 check("developer 降级为 system", developer[0].role === "system");
