@@ -112,9 +112,10 @@ node scripts/selftest.mjs      # 协议 + 存储 + 上游 + 端到端
 node scripts/streamtest.mjs    # SSE 解析与流式输出
 node scripts/adaptertest.mjs   # 按 DSH 调用方式跑 prepareCall/stream，含工具调用
 node scripts/plugintest.mjs    # 模拟 cordis ctx 驱动 apply() 与全部路由
+node scripts/protocoltest.mjs  # 离线：JSON 文本归一化与 auto-review 输出（无需凭据）
 ```
 
-前三个需要真实凭据；`plugintest` 用模拟 ctx，同样会打真实上游。
+前三个需要真实凭据；`plugintest` 用模拟 ctx，同样会打真实上游；`protocoltest` 完全离线。
 
 ## 许可
 

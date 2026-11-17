@@ -1,6 +1,6 @@
 {
   "name": "dsh-deepai-freemodel",
-  "version": "0.3.2",
+  "version": "0.3.6",
   "private": false,
   "type": "module",
   "description": "DeepAI Code 免费模型接入 DeepSeek Harness：浏览器 OAuth 登录直连上游，自带诊断面板与手动 Key 兜底，无需桌面客户端或网关进程。",
@@ -70,7 +70,8 @@
     "selftest": "node scripts/selftest.mjs",
     "streamtest": "node scripts/streamtest.mjs",
     "adaptertest": "node scripts/adaptertest.mjs",
-    "plugintest": "node scripts/plugintest.mjs"
+    "plugintest": "node scripts/plugintest.mjs",
+    "protocoltest": "node scripts/protocoltest.mjs"
   },
   "files": [
     "lib",
