@@ -8,8 +8,11 @@
 
 import {
   buildChatBody,
+  estimateTextTokens,
+  fitChatBody,
   isJsonObjectText,
   isReviewDecisionText,
+  measureChatBody,
   repairAutoReviewDecision,
   retryAfterSeconds,
   sanitizeJsonText,
@@ -284,6 +287,92 @@ check(
   retryAfterSeconds(new Date(Date.now() + 5_000).toUTCString()) >= 1
 );
 check("Retry-After 缺省", retryAfterSeconds(undefined) === 3);
+
+console.log("\n== 请求预算（上游静默截断的防线） ==");
+
+// 中文按 1 字 1 token 估算，英文按 3 字符 1 token，整体只会高估
+check("中文 token 估算不低估", estimateTextTokens("这是一个很长的中文句子") >= 10);
+check("英文 token 估算", estimateTextTokens("a".repeat(300)) === 100);
+
+const toolOutput = (i) => `工具输出 ${i}：` + "文件内容 ".repeat(900);
+
+function bigConversation(exchanges) {
+  const messages = [];
+  for (let i = 0; i < exchanges; i += 1) {
+    messages.push({ role: "user", content: [{ type: "text", text: i === 0 ? "任务：把 v12 原型改造成可部署包。" : `继续第 ${i} 步` }] });
+    messages.push({
+      role: "assistant",
+      content: [
+        { type: "text", text: `我来处理第 ${i} 步。` },
+        { type: "tool-call", id: `c${i}`, name: "read", arguments: `{"path":"f${i}.html"}` }
+      ]
+    });
+    messages.push({ role: "tool", toolCallId: `c${i}`, content: [{ type: "text", text: toolOutput(i) }] });
+  }
+  messages.push({ role: "user", content: [{ type: "text", text: "继续完成任务" }] });
+  return messages;
+}
+
+const bigBody = buildChatBody(
+  { messages: bigConversation(30), system: "You are DeepSeek Harness.", maxTokens: 16_384 },
+  "m"
+);
+const bigBefore = measureChatBody(bigBody);
+const bigSnapshot = JSON.stringify(bigBody);
+const fitted = fitChatBody(bigBody);
+const bigAfter = measureChatBody(fitted.body);
+check("超限请求被识别", bigBefore.tokens > 36_000 || bigBefore.chars > 150_000, `${bigBefore.tokens}t / ${bigBefore.chars}c`);
+check("压缩后落到预算内", bigAfter.tokens <= 36_000 && bigAfter.chars <= 150_000, `${bigAfter.tokens}t / ${bigAfter.chars}c`);
+check("不修改入参", JSON.stringify(bigBody) === bigSnapshot);
+check("system 仍在开头", fitted.body.messages[0].role === "system");
+const fittedText = fitted.body.messages
+  .flatMap((message) => (Array.isArray(message.content) ? message.content : [{ text: message.content }]))
+  .map((block) => block?.text ?? "")
+  .join("\n");
+check("最初任务仍在", fittedText.includes("任务：把 v12 原型改造成可部署包。"));
+check("最后一条消息保留", fitted.body.messages.at(-1).content === "继续完成任务");
+check("旧工具输出被收缩", fittedText.includes("较早的工具输出已省略"), `shrunkTools=${fitted.shrunkTools}`);
+check(
+  "工具调用与结果仍然配对",
+  (() => {
+    const open = new Set();
+    for (const message of fitted.body.messages) {
+      for (const call of message.tool_calls ?? []) open.add(call.id);
+      if (message.role === "tool") {
+        if (!open.delete(message.tool_call_id)) return false;
+      }
+    }
+    return open.size === 0;
+  })()
+);
+
+const smallBody = buildChatBody(
+  { messages: [{ role: "user", content: [{ type: "text", text: "你好" }] }], system: "sys" },
+  "m"
+);
+const untouched = fitChatBody(smallBody);
+check("小请求原样返回", untouched.changed === false && untouched.body === smallBody);
+
+const hugeTask = buildChatBody(
+  {
+    messages: [
+      { role: "user", content: [{ type: "text", text: "任务：" + "细节".repeat(60_000) }] },
+      { role: "user", content: [{ type: "text", text: "继续" }] }
+    ],
+    system: "sys"
+  },
+  "m"
+);
+const hugeFitted = fitChatBody(hugeTask);
+check(
+  "单条超大消息也会被截断",
+  measureChatBody(hugeFitted.body).tokens <= 36_000 && measureChatBody(hugeFitted.body).chars <= 150_000,
+  `${measureChatBody(hugeFitted.body).tokens}t / ${measureChatBody(hugeFitted.body).chars}c`
+);
+check(
+  "超大任务仍保留开头",
+  JSON.stringify(hugeFitted.body.messages).includes("任务：细节细节")
+);
 
 console.log(`\n${failures === 0 ? "协议自检全部通过" : `${failures} 项失败`}`);
 process.exit(failures === 0 ? 0 : 1);
