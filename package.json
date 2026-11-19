@@ -1,9 +1,9 @@
 {
   "name": "dsh-deepai-freemodel",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "private": false,
   "type": "module",
-  "description": "DeepAI Code 免费模型接入 DeepSeek Harness：浏览器 OAuth 登录直连上游，自带诊断面板与手动 Key 兜底，无需桌面客户端或网关进程。",
+  "description": "DeepAI Code 免费模型接入 DeepSeek Harness：浏览器 OAuth 登录直连上游，自动发现本机代理，自带诊断面板与手动 Key 兜底，无需桌面客户端或网关进程。",
   "author": "cheungray123 <https://github.com/cheungray123>",
   "repository": {
     "type": "git",
@@ -71,7 +71,9 @@
     "streamtest": "node scripts/streamtest.mjs",
     "adaptertest": "node scripts/adaptertest.mjs",
     "plugintest": "node scripts/plugintest.mjs",
-    "protocoltest": "node scripts/protocoltest.mjs"
+    "protocoltest": "node scripts/protocoltest.mjs",
+    "proxytest": "node scripts/proxytest.mjs",
+    "logintest": "node scripts/logintest.mjs"
   },
   "files": [
     "lib",
